@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Расчёт зарплаты и НДФЛ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell" data-current-year="{{ current_year }}">
+      <section class="workspace" aria-labelledby="title">
+        <div class="masthead">
+          <div>
+            <p class="eyebrow">Калькулятор зарплаты для богачей</p>
+            <h1 id="title">Расчёт зарплаты и НДФЛ</h1>
+          </div>
+          <div class="privacy-note">
+            Данные остаются в браузере. Сервер не хранит профиль, историю или введённые суммы.
+          </div>
+        </div>
+
+        <form id="salary-form" class="control-grid">
+          <label class="field">
+            <span>Зарплата до вычета, ₽</span>
+            <input id="grossSalary" name="grossSalary" inputmode="decimal" autocomplete="off" placeholder="250000">
+          </label>
+          <label class="field">
+            <span>Число аванса</span>
+            <input id="advanceDay" name="advanceDay" type="number" min="16" max="31" step="1">
+          </label>
+          <label class="field">
+            <span>Число зарплаты</span>
+            <input id="salaryDay" name="salaryDay" type="number" min="1" max="15" step="1">
+          </label>
+          <label class="field">
+            <span>Год</span>
+            <input id="year" name="year" type="number" min="2000" max="2100" step="1">
+          </label>
+          <label class="field">
+            <span>Стаж для больничного</span>
+            <select id="sickExperienceRate" name="sickExperienceRate">
+              <option value="1">8+ лет: 100%</option>
+              <option value="0.8">5-8 лет: 80%</option>
+              <option value="0.6">до 5 лет: 60%</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Доход за 2 года, ₽</span>
+            <input id="sickIncomeTwoYears" name="sickIncomeTwoYears" inputmode="decimal" autocomplete="off" placeholder="авто: оклад × 24">
+          </label>
+        </form>
+
+        <section class="editor-grid" aria-label="Дополнительные выплаты, отпуска и больничные">
+          <div class="panel">
+            <div class="panel-title">
+              <h2>Отпуска</h2>
+              <button id="addVacation" class="icon-text-button" type="button" title="Добавить отпуск">
+                <span aria-hidden="true">+</span>
+                <span>Отпуск</span>
+              </button>
+            </div>
+            <div id="vacationRows" class="dynamic-rows"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">
+              <h2>Больничные</h2>
+              <button id="addSickLeave" class="icon-text-button" type="button" title="Добавить больничный">
+                <span aria-hidden="true">+</span>
+                <span>Больничный</span>
+              </button>
+            </div>
+            <div id="sickRows" class="dynamic-rows"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">
+              <h2>Премии</h2>
+              <button id="addBonus" class="icon-text-button" type="button" title="Добавить премию">
+                <span aria-hidden="true">+</span>
+                <span>Премия</span>
+              </button>
+            </div>
+            <div id="bonusRows" class="dynamic-rows"></div>
+          </div>
+        </section>
+
+        <div class="action-row">
+          <button id="calculateButton" class="primary-button" type="button">Рассчитать</button>
+          <button id="clearButton" class="ghost-button" type="button">Сбросить локальные данные</button>
+          <span id="status" class="status" role="status"></span>
+        </div>
+
+        <section id="warnings" class="warnings" hidden></section>
+
+        <section class="summary-strip" aria-label="Итоги">
+          <div>
+            <span>Доход до НДФЛ</span>
+            <strong id="totalGross">0 ₽</strong>
+          </div>
+          <div>
+            <span>НДФЛ</span>
+            <strong id="totalTax">0 ₽</strong>
+          </div>
+          <div>
+            <span>На руки</span>
+            <strong id="totalNet">0 ₽</strong>
+          </div>
+          <div>
+            <span>Среднее в месяц</span>
+            <strong id="averageNet">0 ₽</strong>
+          </div>
+        </section>
+
+        <section class="table-wrap" aria-label="Таблица выплат">
+          <table>
+            <thead>
+              <tr>
+                <th>Месяц</th>
+                <th>Зарплата</th>
+                <th>Аванс</th>
+                <th>Отпускные</th>
+                <th>Больничные</th>
+                <th>Премии</th>
+                <th>НДФЛ</th>
+                <th>На руки</th>
+                <th>База с начала года</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+          </table>
+        </section>
+
+        <details class="assumptions">
+          <summary>Модель расчёта</summary>
+          <ul id="assumptions"></ul>
+        </details>
+      </section>
+    </main>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

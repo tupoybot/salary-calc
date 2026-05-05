@@ -1,0 +1,404 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f7f3;
+  --surface: #ffffff;
+  --surface-strong: #eef4f1;
+  --ink: #1f2933;
+  --muted: #687583;
+  --line: #d9e2dc;
+  --accent: #196f6b;
+  --accent-strong: #0f5754;
+  --danger-bg: #fff3eb;
+  --danger-line: #efb083;
+  --shadow: 0 20px 60px rgba(31, 41, 51, 0.08);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(180deg, rgba(25, 111, 107, 0.08), transparent 300px),
+    var(--bg);
+  color: var(--ink);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 28px;
+}
+
+.workspace {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(34px, 5vw, 60px);
+  line-height: 1;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+.privacy-note {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.75);
+  padding: 14px 16px;
+  border-radius: 8px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.control-grid,
+.editor-grid,
+.summary-strip {
+  display: grid;
+  gap: 12px;
+}
+
+.control-grid {
+  grid-template-columns: 2fr repeat(3, minmax(130px, 1fr));
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.field,
+.dynamic-row label {
+  display: grid;
+  gap: 6px;
+}
+
+.field span,
+.dynamic-row span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 9px 11px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(25, 111, 107, 0.13);
+}
+
+.editor-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 14px;
+}
+
+.panel-title,
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panel-title {
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dynamic-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.dynamic-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 40px;
+  gap: 8px;
+  align-items: end;
+}
+
+.bonus-row {
+  grid-template-columns: 1fr 1fr 40px;
+}
+
+.empty-row {
+  min-height: 42px;
+  display: grid;
+  align-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  padding: 0 12px;
+}
+
+.icon-text-button,
+.primary-button,
+.ghost-button,
+.icon-button {
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0 13px;
+  font-weight: 750;
+}
+
+.icon-text-button,
+.ghost-button,
+.icon-button {
+  background: var(--surface-strong);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.icon-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.icon-text-button span:first-child {
+  font-size: 21px;
+  line-height: 1;
+}
+
+.icon-button {
+  width: 40px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.primary-button {
+  background: var(--accent);
+  color: #fff;
+  padding: 0 18px;
+}
+
+.primary-button:hover {
+  background: var(--accent-strong);
+}
+
+.action-row {
+  margin: 14px 0;
+  flex-wrap: wrap;
+}
+
+.status {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.warnings {
+  border: 1px solid var(--danger-line);
+  background: var(--danger-bg);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.warnings p {
+  margin: 4px 0;
+}
+
+.summary-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 14px 0;
+}
+
+.summary-strip div {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 14px;
+}
+
+.summary-strip span,
+.payment-cell span,
+.payment-cell small,
+.work-days {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.summary-strip strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 24px;
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+table {
+  width: 100%;
+  min-width: 1180px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-strong);
+  color: #33424f;
+  font-size: 13px;
+}
+
+tbody tr:hover {
+  background: #fbfcfa;
+}
+
+tbody tr:last-child th,
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.month-name {
+  display: block;
+  font-weight: 800;
+}
+
+.payment-cell {
+  display: grid;
+  gap: 2px;
+  min-width: 116px;
+}
+
+.payment-cell strong,
+.money-cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.money-cell {
+  white-space: nowrap;
+}
+
+.strong {
+  font-weight: 850;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.assumptions {
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+.assumptions summary {
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.assumptions li {
+  margin: 6px 0;
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    padding: 18px;
+  }
+
+  .masthead,
+  .control-grid,
+  .editor-grid,
+  .summary-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  .dynamic-row,
+  .bonus-row {
+    grid-template-columns: 1fr 40px;
+  }
+
+  .dynamic-row label:first-child,
+  .bonus-row label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .privacy-note,
+  .control-grid,
+  .panel,
+  .summary-strip div,
+  .table-wrap {
+    border-radius: 6px;
+  }
+}

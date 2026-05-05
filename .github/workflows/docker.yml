@@ -1,0 +1,134 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: python -m pytest -q
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Remove old package versions and workflow runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          PACKAGE: ${{ github.event.repository.name }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          token = os.environ["GH_TOKEN"]
+          owner = os.environ["OWNER"]
+          repo = os.environ["REPOSITORY"]
+          package = urllib.parse.quote(os.environ["PACKAGE"], safe="")
+          current_run_id = int(os.environ["CURRENT_RUN_ID"])
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+          }
+
+          def request(method, url):
+              req = urllib.request.Request(url, method=method, headers=headers)
+              try:
+                  with urllib.request.urlopen(req) as response:
+                      body = response.read()
+                      return response.status, json.loads(body or b"null")
+              except urllib.error.HTTPError as exc:
+                  body = exc.read().decode("utf-8", "replace")
+                  print(f"{method} {url} -> {exc.code}: {body}")
+                  return exc.code, None
+
+          versions_url = f"https://api.github.com/users/{owner}/packages/container/{package}/versions?per_page=100"
+          status, versions = request("GET", versions_url)
+          if status == 200 and versions:
+              for version in versions:
+                  tags = version.get("metadata", {}).get("container", {}).get("tags", [])
+                  if "latest" in tags:
+                      continue
+                  delete_url = f"https://api.github.com/users/{owner}/packages/container/{package}/versions/{version['id']}"
+                  delete_status, _ = request("DELETE", delete_url)
+                  print(f"package version {version['id']} tags={tags}: delete status {delete_status}")
+
+          runs_url = f"https://api.github.com/repos/{repo}/actions/runs?per_page=100"
+          status, runs_payload = request("GET", runs_url)
+          if status == 200 and runs_payload:
+              for run in runs_payload.get("workflow_runs", []):
+                  if run["id"] == current_run_id:
+                      continue
+                  if run["status"] != "completed":
+                      continue
+                  delete_url = f"https://api.github.com/repos/{repo}/actions/runs/{run['id']}"
+                  delete_status, _ = request("DELETE", delete_url)
+                  print(f"workflow run {run['id']}: delete status {delete_status}")
+          PY

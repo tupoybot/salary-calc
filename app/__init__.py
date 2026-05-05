@@ -1,0 +1,2 @@
+"""Salary calculator web app."""
+
